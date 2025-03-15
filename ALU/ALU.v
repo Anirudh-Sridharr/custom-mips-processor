@@ -7,6 +7,12 @@ output reg [15:0]      dout
 );
 
 reg [31:0] mulreg;
+reg overflow;
+reg zeroflag;
+reg negativeflag;
+reg signflag;
+reg carryflag;
+reg parityflag;
 
 `define add  4'b0001
 `define sub  4'b0010
@@ -19,7 +25,10 @@ reg [31:0] mulreg;
 `define bxor 4'b1001
 `define bnot 4'b1010
 `define slli 4'b1011
-`define srli 4'b1110
+`define srli 4'b1101
+`define isgt 4'b1100
+`define isneq 4'b1101
+
 // `define slai 4'b1100;
 // `define srai 4'b1101;
 // below code is just for testing the alu alone, ALUtest.mem need not bear any relevance later
@@ -51,6 +60,8 @@ case (Aluctrl)
         `slli: dout = din1 << din2;
         `srli: dout = din1 >> din2;
         `mv:   dout = din1; // Move input 1 to output
+        `isgt: dout = (din1 > din2) ? 1 : 0;
+        `isneq: dout = (din1 != din2) ? 1 : 0;
         default: dout = din1; // Default case to handle unspecified Aluctrl values
     endcase
 // zeroflag = (|dout);

@@ -105,7 +105,7 @@ begin
                 Aluctrl = 4'b0101; 
                 din1 =  GPR[`rsrc1];
                 din2 = 16'b0; 
-                PC = dout?(PC+4):(`br_addr);
+                PC = dout?(`br_addr):(PC+4);
             end
         6'b001011:// bnez
             begin
@@ -115,13 +115,42 @@ begin
                 PC = dout?(PC+4):(br_addr);
             end
 
-
         //for blt, bgt add isgt snd islt instructions. 
-        6'b001001: //bneq 
+        6'b001100: //blt
+            begin
+                Aluctrl = 4'b1101;
+                din1 = GPR[`rsrc1];
+                din2 = GPR[`rsrc2];
+                dout = GPR[`rdst];
+                PC = dout?(`br_addr):(PC+4);
             end
 
+        6'b001101: //bgt
+            begin
+                Aluctrl = 4'b1100;
+                din1 = GPR[`rsrc1];
+                din2 = GPR[`rsrc2];
+                dout = GPR[`rdst];
+                PC = dout?(`br_addr):(PC+4);
+            end
 
+        6'b001110: //bgez
+            begin
+                Aluctrl = 4'b1100;
+                din1 = GPR[`rsrc1];
+                din2 = 16'b0;
+                dout = GPR[`rdst];
+                PC = dout?(`br_addr):(PC+4);
+            end
 
+        6'b001111: //blez
+            begin
+                Aluctrl = 4'b1101;
+                din1 = GPR[`rsrc1];
+                din2 = 16'b0;
+                dout = GPR[`rdst];
+                PC = dout?(`br_addr):(PC+4);
+            end
 
 
                 endcase
