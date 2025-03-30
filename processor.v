@@ -3,3 +3,5 @@
 
 module processor();
 reg clk;
+
+endmodule 

@@ -1,5 +1,5 @@
 `include ALU.v
-module control()
+module control();
 //instruction register and memory
 reg [31:0] IR; 
 reg [31:0] inst_mem [6:0];

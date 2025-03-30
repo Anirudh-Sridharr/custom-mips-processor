@@ -18,16 +18,17 @@ reg parityflag;
 `define sub  4'b0010
 `define mul  4'b0011
 `define islt 4'b0100
-`define iseq 4'b0101
-`define bor  4'b0110
-`define band 4'b0111
-`define mv   4'b1000
-`define bxor 4'b1001
-`define bnot 4'b1010
-`define slli 4'b1011
+`define isgt 4'b0101
+`define iseq 4'b0110
+`define isneq 4'b0111
+`define bor  4'b1000
+`define band 4'b1001
+`define bxor 4'b1010
+`define bnot 4'b1011
+`define slli 4'b1100
 `define srli 4'b1101
-`define isgt 4'b1100
-`define isneq 4'b1101
+
+
 
 // `define slai 4'b1100;
 // `define srai 4'b1101;
