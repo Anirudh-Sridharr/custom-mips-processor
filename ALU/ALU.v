@@ -44,7 +44,7 @@ reg parityflag;
 // // output reg zeroflag; 
 // output wire done; 
 // output reg [15:0]      dout; 
-always @(*) begin
+always @(Aluctrl) begin
 case (Aluctrl)
         `add: dout = din1 + din2;
         `sub: dout = din1 - din2;
@@ -52,7 +52,7 @@ case (Aluctrl)
                 mulreg = din1 * din2;
                 dout = [15:0] mulreg;
               end
-        `islt: dout = (din1 > din2) ? 0 : 1;
+        `islt: dout = (din1 < din2) ? 1 : 0;
         `iseq: dout = (din1 == din2) ? 1 : 0;
         `bor: dout = din1 | din2;
         `band: dout = din1 & din2;
@@ -60,7 +60,7 @@ case (Aluctrl)
         `bnot: dout = ~din1; // Use ~ for bitwise NOT
         `slli: dout = din1 << din2;
         `srli: dout = din1 >> din2;
-        `mv:   dout = din1; // Move input 1 to output
+        // `mv:   dout = din1; // Move input 1 to output
         `isgt: dout = (din1 > din2) ? 1 : 0;
         `isneq: dout = (din1 != din2) ? 1 : 0;
         default: dout = din1; // Default case to handle unspecified Aluctrl values
