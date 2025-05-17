@@ -11,8 +11,8 @@ reg overflow;
 reg zeroflag;
 reg negativeflag;
 reg signflag;
-reg carryflag;
-reg parityflag;
+
+
 
 `define add  4'b0001
 `define sub  4'b0010
@@ -46,12 +46,22 @@ reg parityflag;
 // output reg [15:0]      dout; 
 always @(Aluctrl) begin
 case (Aluctrl)
-        `add: dout = din1 + din2;
-        `sub: dout = din1 - din2;
-        `mul: begin 
-                mulreg = din1 * din2;
-                dout = [15:0] mulreg;
-              end
+        `add: 
+        begin
+          dout = din1 + din2;
+          overflow = (din1[15] == din2[15]) && (dout[15] != din1[15]);
+        end
+        `sub: 
+        begin
+          dout = din1 - din2;
+          overflow = (din1[15] != din2[15]) && (dout[15] != din1[15]);
+        end
+        `mul: 
+        begin 
+          mulreg = din1 * din2;
+          dout = [15:0] mulreg;
+          overflow = (mulreg[31:16] != 0); 
+        end
         `islt: dout = (din1 < din2) ? 1 : 0;
         `iseq: dout = (din1 == din2) ? 1 : 0;
         `bor: dout = din1 | din2;
@@ -65,6 +75,6 @@ case (Aluctrl)
         `isneq: dout = (din1 != din2) ? 1 : 0;
         default: dout = din1; // Default case to handle unspecified Aluctrl values
     endcase
-// zeroflag = (|dout);
+  zeroflag = (|dout);
 end 
 endmodule
