@@ -38,17 +38,11 @@ begin
                         GPR[`rdst] = dout;
                     end 
 
-                    4'b010x: begin// ISEQ, ISLT
+                    4'b01xx: begin// ISEQ, ISLT, ISNEQ, ISGT
                         assign din1 = GPR[`rsrc1];
                         assign din2 = GPR[`rsrc2];
                         GPR[`rdst] = dout;
                     end 
-
-                   /* 4'b111x: begin// SLLI, SRLI
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = `shamt;
-                        GPR[`rdst] = dout;
-                    end */
 
                     default: begin
                         assign din1 = 0;
@@ -73,13 +67,18 @@ begin
                         GPR[`rdst] = dout;
                     end
 
-                    4'b010x: begin // ISEQ, ISLT
+                    4'b01xx: begin // ISEQ, ISLT, ISNEQ, ISGT
                         assign din1 = GPR[`rsrc1];
                         assign din2 = IR[15:0];
                         GPR[`rdst] = dout;
                     end
 
-                    4'b111x: begin // SLLI, SRLI
+                    4'b1100: begin // SLLI
+                        assign din1 = GPR[`rsrc1];
+                        assign din2 = IR[15:0];
+                        GPR[`rdst] = dout;
+                    end
+                    4'b1101: begin // SRLI
                         assign din1 = GPR[`rsrc1];
                         assign din2 = IR[15:0];
                         GPR[`rdst] = dout;
