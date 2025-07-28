@@ -1,0 +1,50 @@
+module ID(
+
+input wire [31:0]IR,
+
+output wire [4:0]outreg, 
+output wire [4:0]inreg1, 
+output wire [4:0]inreg2,
+
+output wire [15:0]imm,  
+output wire [6:0]opcode, 
+output wire [10:0]funct,
+
+output wire [25:0]Jaddr, 
+output wire [15:0]braddr,  
+);
+
+
+
+
+endmodule 
+
+module ctrl_unit(
+
+input wire [31:0]IR, //Instruction
+
+output wire [3:0]alu_ctrl,	//ALU control signal
+output wire [7:0]br_addr,	//branch address if calculated (should this be here)
+output wire branch,		//Flag to take branching 	
+output wire [7:0]PC_calc,	//Calculated PC to handle jumps
+
+output wire [7:0]srcreg1,	//source 
+output wire [7:0]srcreg2,
+
+);
+
+/*
+All control signals only, no information 
+ALUctrl 
+
+Srcaddr1 [Datasrc][read_en][Alusrc]
+Destaddr [Writesrc][write_en]
+Srcaddr2 [Datasrc][read_en][Alusrc]
+
+Branch condition [PCsrc]
+jump condition   [PCsrc]
+Imm-mode 	 [Datasrc]
+
+
+*/
+endmodule 

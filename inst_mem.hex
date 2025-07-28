@@ -1,0 +1,22 @@
+// Sample instruction memory for testing
+// Format: 32-bit instructions in hex
+// Instructions are encoded as:
+// [31:26] opcode
+// [25:21] rdst
+// [20:16] rsrc1
+// [15:11] rsrc2
+// [10:7]  shamt
+// [6:0]   functR
+
+// add r1, r2, r3
+00000001_00010_00011_0000_0001
+// sub r4, r5, r6
+00000100_00101_00110_0000_0010
+// mul r7, r8, r9
+00000111_01000_01001_0000_0011
+// beq r1, r2, 0x100
+00100000_00001_00010_0000_0100
+// bneq r3, r4, 0x200
+00100100_00011_00100_0000_0101
+// j 0x1000
+00000010_00000_00000_0000_0110

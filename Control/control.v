@@ -1,161 +1,54 @@
-`include ALU.v
-module control();
-//instruction register and memory
-reg [31:0] IR; 
-reg [31:0] inst_mem [6:0];
-reg [31:0] data_mem [31:0];
-reg [31:0] GPR  [4:0];
-reg [15:0] dtemp;
-`define opcode  IR[31:26];
-`define rdst    IR[25:21];
-`define rsrc1   IR[20:16];
-`define rsrc2   IR[15:11]; 
-`define shamt   IR[10:7]; 
-`define functR  IR[6:0]; //R-type ALU code function 
-
-`define imm     IR[15:0];
-`define br_addr  IR[15:0];
-`define j_addr  IR[25:0];
-
-
-always @(IR)
 begin 
-    case(opcode)
-        6'b000000: // 3-reg ALU instructions  
-            begin 
-                Aluctrl = functR[3:0];
-                casex(Aluctrl)
 
-                    4'b00xx: begin //ADD, SUB. MUL
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = GPR[`rsrc2];
-                        GPR[`rdst] = dout;
-                    end
+// Control Unit for RISC Processor
+// Only generates control signals based on opcode and funct fields
+module control_unit(
+    input wire [5:0] opcode,
+    input wire [6:0] functR,
+    output reg [3:0] Aluctrl,
+    output reg RegWrite,
+    output reg MemWrite,
+    output reg Branch,
+    output reg [1:0] ALUSrc // 0: reg-reg, 1: reg-imm, 2: branch
+);
 
-                    4'b10xx: begin// BOR, BAND, BXOR, BNOT
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = GPR[`rsrc2];
-                        GPR[`rdst] = dout;
-                    end 
+always @(*) begin
+    // Default values
+    Aluctrl = 4'b0000;
+    RegWrite = 0;
+    MemWrite = 0;
+    Branch = 0;
+    ALUSrc = 2'b00;
 
-                    4'b01xx: begin// ISEQ, ISLT, ISNEQ, ISGT
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = GPR[`rsrc2];
-                        GPR[`rdst] = dout;
-                    end 
-
-                    default: begin
-                        assign din1 = 0;
-                        assign din2 = 0;
-                        GPR[`rdst] = 0;
-                    end
-
-        6'b01xxxx: // ALU-Immmediate instructions 
-            begin
-                    Aluctrl = [3:0] opcode; 
-                    case(Aluctrl)
-                    //should you be handling mulreg here? 
-                    4'b00xx: begin //ADD, SUB. MUL
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = IR[15:0];
-                        GPR[`rdst] = dout;
-                    
-                    end
-                    4'b10xx: begin // BOR, BAND, BXOR, BNOT
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = IR[15:0];
-                        GPR[`rdst] = dout;
-                    end
-
-                    4'b01xx: begin // ISEQ, ISLT, ISNEQ, ISGT
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = IR[15:0];
-                        GPR[`rdst] = dout;
-                    end
-
-                    4'b1100: begin // SLLI
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = IR[15:0];
-                        GPR[`rdst] = dout;
-                    end
-                    4'b1101: begin // SRLI
-                        assign din1 = GPR[`rsrc1];
-                        assign din2 = IR[15:0];
-                        GPR[`rdst] = dout;
-                    end
-                    endcase
-            end 
-        //6'b001xxx: //branch instructions, hardcoded in all 8 cases
-        6'b001000:// beq
-            begin
-                Aluctrl = 4'b0110; 
-                din1 =  GPR[`rsrc1];
-                din2 = GPR[`rsrc2]; 
-                PC = dout?(`br_addr):(PC+4);
-            end
-        6'b001001:// bneq
-            begin
-                Aluctrl = 4'b0110; 
-                din1 =  GPR[`rsrc1];
-                din2 = GPR[`rsrc2]; 
-                PC = dout?(PC+4):(`br_addr);
-            end
-        6'b001010:// bez
-            begin
-                Aluctrl = 4'b0110; 
-                din1 =  GPR[`rsrc1];
-                din2 = 16'b0; 
-                PC = dout?(`br_addr):(PC+4);
-            end
-        6'b001011:// bnez
-            begin
-                Aluctrl = 4'b0110; 
-                din1 =  rsrc1;
-                din2 = 16'b0; 
-                PC = dout?(PC+4):(br_addr);
-            end
-
-        //for blt, bgt add isgt snd islt instructions. 
-        6'b001100: //blt
-            begin
-                Aluctrl = 4'b0100;
-                din1 = GPR[`rsrc1];
-                din2 = GPR[`rsrc2];
-                dout = GPR[`rdst];
-                PC = dout?(`br_addr):(PC+4);
-            end
-
-        6'b001101: //bgt
-            begin
-                Aluctrl = 4'b0101;
-                din1 = GPR[`rsrc1];
-                din2 = GPR[`rsrc2];
-                dout = GPR[`rdst];
-                PC = dout?(`br_addr):(PC+4);
-            end
-
-        6'b001110: //bgez
-            begin
-                Aluctrl = 4'b0100;
-                din1 = GPR[`rsrc1];
-                din2 = 16'b0;
-                dout = GPR[`rdst];
-                PC = (!dout)?(`br_addr):(PC+4);
-            end
-
-        6'b001111: //blez
-            begin
-                Aluctrl = 4'b0101;
-                din1 = GPR[`rsrc1];
-                din2 = 16'b0;
-                dout = GPR[`rdst];
-                PC = (!dout)?(`br_addr):(PC+4);
-            end
-
-
-                endcase
-            end
-
-    endcase 
-end 
-endmodule 
+    case (opcode)
+        6'b000000: begin // R-type ALU instructions
+            Aluctrl = functR[3:0];
+            RegWrite = 1;
+            ALUSrc = 2'b00;
+        end
+        6'b010000, 6'b010001, 6'b010010, 6'b010011, 6'b010100, 6'b010101: begin // I-type ALU instructions
+            Aluctrl = opcode[3:0];
+            RegWrite = 1;
+            ALUSrc = 2'b01;
+        end
+        6'b100000: begin // Memory write
+            MemWrite = 1;
+            ALUSrc = 2'b01;
+        end
+        6'b001000, 6'b001001, 6'b001010, 6'b001011, 6'b001100, 6'b001101, 6'b001110, 6'b001111: begin // Branches
+            Branch = 1;
+            ALUSrc = 2'b10;
+            // Aluctrl can be set for comparison
+            Aluctrl = 4'b0110; // Example: ISEQ for beq/bneq
+        end
+        default: begin
+            // NOP or undefined
+            Aluctrl = 4'b0000;
+            RegWrite = 0;
+            MemWrite = 0;
+            Branch = 0;
+            ALUSrc = 2'b00;
+        end
+    endcase
+end
+endmodule
